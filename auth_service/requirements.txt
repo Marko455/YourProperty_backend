@@ -1,1 +1,8 @@
-pip install "fastapi[standard]"
+fastapi
+uvicorn
+python-jose[cryptography]
+passlib[bcrypt]
+boto3
+pydantic[email]
+pydantic-settings
+python-dotenv
