@@ -1,3 +1,3 @@
 DYNAMODB_TABLE = "properties"
-DYNAMODB_ENDPOINT = "http://dynamodb:8000"
+DYNAMODB_ENDPOINT = "http://localhost:8000"
 REGION = "local"
