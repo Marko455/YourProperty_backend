@@ -1,10 +1,11 @@
 from pydantic import BaseModel
 from typing import Optional
+from decimal import Decimal
 
 class PropertyBase(BaseModel):
     title: str
     description: str
-    price: float
+    price: Decimal
     location: str
     type: str
 
@@ -14,7 +15,7 @@ class PropertyCreate(PropertyBase):
 class PropertyUpdate(BaseModel):
     title: Optional[str]
     description: Optional[str]
-    price: Optional[float]
+    price: Optional[Decimal]
     location: Optional[str]
     type: Optional[str]
 

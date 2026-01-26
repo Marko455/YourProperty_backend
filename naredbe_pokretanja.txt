@@ -1,1 +1,3 @@
-property-service: uvicorn app.main:app --reload --port 8001
+property-service unutar app direktorija: uvicorn main:app --reload --port 8001
+user-service unutar app direktorija: uvicorn main:app --reload --port 8002
+inquery-service unutar app direktorija: uvicorn main:app --reload --port 8003
