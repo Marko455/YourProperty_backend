@@ -2,24 +2,21 @@ from fastapi import APIRouter, HTTPException, Depends
 from models import UserRegister, UserLogin
 from db import get_table
 from auth import (
-    hash_password,
     verify_password,
     create_access_token,
     get_current_user
 )
 import uuid
-from datetime import datetime
-
 router = APIRouter(prefix="/users", tags=["Users"])
 table = get_table()
 
 @router.post("/register")
 def register(user: UserRegister):
-    # Check if email already exists
     response = table.scan(
         FilterExpression="email = :e",
         ExpressionAttributeValues={":e": user.email}
     )
+    print(user.email)
 
     if response["Items"]:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -29,10 +26,10 @@ def register(user: UserRegister):
     item = {
         "user_id": user_id,
         "email": user.email,
-        "password_hash": hash_password(user.password),
+        "password": user.password,
         "role": user.role,
-        "created_at": datetime.utcnow().isoformat()
     }
+    print(item)
 
     table.put_item(Item=item)
 
@@ -51,7 +48,7 @@ def login(user: UserLogin):
 
     db_user = response["Items"][0]
 
-    if not verify_password(user.password, db_user["password_hash"]):
+    if not verify_password(user.password, db_user["password"]):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     token = create_access_token({

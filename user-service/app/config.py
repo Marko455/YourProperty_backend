@@ -1,5 +1,5 @@
 DYNAMODB_TABLE = "users"
-DYNAMODB_ENDPOINT = "http://dynamodb:8000"
+DYNAMODB_ENDPOINT = "http://localhost:8000"
 REGION = "local"
 
 JWT_SECRET = "super-secret-key"

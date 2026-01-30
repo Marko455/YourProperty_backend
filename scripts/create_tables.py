@@ -52,19 +52,34 @@ def create_users_table():
         print(f"✅ Table '{table_name}' already exists")
         return
 
+    print(f"🛠 Creating table '{table_name}'...")
+
     dynamodb.create_table(
         TableName=table_name,
         AttributeDefinitions=[
-            {"AttributeName": "user_id", "AttributeType": "S"}
+            {"AttributeName": "user_id", "AttributeType": "S"},
+            {"AttributeName": "email", "AttributeType": "S"},
         ],
         KeySchema=[
             {"AttributeName": "user_id", "KeyType": "HASH"}
+        ],
+        GlobalSecondaryIndexes=[
+            {
+                "IndexName": "email-index",
+                "KeySchema": [
+                    {"AttributeName": "email", "KeyType": "HASH"}
+                ],
+                "Projection": {
+                    "ProjectionType": "ALL"
+                }
+            }
         ],
         BillingMode="PAY_PER_REQUEST"
     )
 
     dynamodb.get_waiter("table_exists").wait(TableName=table_name)
     print(f"🎉 Table '{table_name}' created")
+
 
 def create_inquiries_table():
     table_name = "inquiries"

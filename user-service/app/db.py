@@ -10,4 +10,7 @@ dynamodb = boto3.resource(
 )
 
 def get_table():
-    return dynamodb.Table(DYNAMODB_TABLE)
+    try:
+        return dynamodb.Table(DYNAMODB_TABLE)
+    except Exception:
+        raise RuntimeError("DynamoDB table not found")
