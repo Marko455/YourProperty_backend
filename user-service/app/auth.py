@@ -7,10 +7,7 @@ from config import JWT_SECRET, JWT_ALGORITHM, JWT_EXPIRE_MINUTES
 
 security = HTTPBearer()
 
-# ❌ Removed hash_password entirely
-
 def verify_password(password: str, stored_password: str) -> bool:
-    # Plain-text comparison (NOT secure)
     return password == stored_password
 
 
