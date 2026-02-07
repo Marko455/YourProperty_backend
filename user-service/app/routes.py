@@ -25,9 +25,11 @@ def register(user: UserRegister):
 
     item = {
         "user_id": user_id,
+        "name": user.name,
         "email": user.email,
         "password": user.password,
         "role": user.role,
+        "phone_number": user.phone_number
     }
     print(item)
 
@@ -63,3 +65,22 @@ def login(user: UserLogin):
 @router.get("/me")
 def get_me(current_user=Depends(get_current_user)):
     return current_user
+
+@router.get("/me/profile")
+def get_my_profile(current_user=Depends(get_current_user)):
+    response = table.get_item(
+        Key={"user_id": current_user["user_id"]}
+    )
+
+    if "Item" not in response:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    user = response["Item"]
+
+    return {
+        "user_id": user["user_id"],
+        "name": user["name"],
+        "email": user["email"],
+        "role": user["role"],
+        "phone_number": user["phone_number"]
+    }
