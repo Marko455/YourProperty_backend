@@ -1,4 +1,15 @@
-property-service unutar app direktorija: uvicorn main:app --reload --port 8001
-user-service unutar app direktorija: uvicorn main:app --reload --port 8002
-inquery-service unutar app direktorija: uvicorn main:app --reload --port 8003
-scripts: python create_tables.py
+property-service: 
+    cd C:\Users\marco\Documents\YourProperty\backend\property-service\app
+    uvicorn main:app --reload --port 8001
+
+user-service: 
+    cd C:\Users\marco\Documents\YourProperty\backend\user-service\app
+    uvicorn main:app --reload --port 8002
+
+inquery-service: 
+    cd C:\Users\marco\Documents\YourProperty\backend\inquiry-service\app
+    uvicorn main:app --reload --port 8003
+
+scripts: 
+    cd C:\Users\marco\Documents\YourProperty\backend\scripts
+    python create_tables.py
