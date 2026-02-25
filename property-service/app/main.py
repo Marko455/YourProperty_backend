@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from routes import router
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+
 app = FastAPI(title="Property Service")
 
 app.add_middleware(
@@ -12,3 +14,4 @@ app.add_middleware(
 )
 
 app.include_router(router)
+

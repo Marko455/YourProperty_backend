@@ -1,7 +1,9 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form
 from models import PropertyCreate, PropertyUpdate
 from db import get_table
 import uuid
+import shutil
+from typing import List
 from datetime import datetime
 
 router = APIRouter(prefix="/properties", tags=["Properties"])
