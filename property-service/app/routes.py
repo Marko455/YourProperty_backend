@@ -1,10 +1,14 @@
-from fastapi import APIRouter, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, HTTPException, UploadFile, File
 from models import PropertyCreate, PropertyUpdate
 from db import get_table
 import uuid
 import shutil
-from typing import List
 from datetime import datetime
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+UPLOAD_DIR = BASE_DIR / "uploads"
+UPLOAD_DIR.mkdir(exist_ok=True)
 
 router = APIRouter(prefix="/properties", tags=["Properties"])
 
@@ -74,3 +78,35 @@ def update_property(property_id: str, update: PropertyUpdate):
 def delete_property(property_id: str):
     table.delete_item(Key={"property_id": property_id})
     return {"message": "Property deleted"}
+
+@router.post("/{property_id}/images")
+async def upload_property_image(
+    property_id: str,
+    file: UploadFile = File(...)
+):
+    response = table.get_item(Key={"property_id": property_id})
+    if "Item" not in response:
+        raise HTTPException(status_code=404, detail="Property not found")
+
+    filename = f"{uuid.uuid4()}-{file.filename}"
+    filepath = UPLOAD_DIR / filename
+
+    with open(filepath, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    image_url = f"/uploads/{filename}"
+
+    table.update_item(
+        Key={"property_id": property_id},
+        UpdateExpression="SET images = list_append(if_not_exists(images, :empty), :img)",
+        ExpressionAttributeValues={
+            ":img": [image_url],
+            ":empty": []
+        }
+    )
+
+    return {
+        "message": "Image uploaded",
+        "property_id": property_id,
+        "image_url": image_url
+    }

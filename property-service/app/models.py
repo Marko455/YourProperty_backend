@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from decimal import Decimal
 
 class PropertyBase(BaseModel):
@@ -30,3 +30,4 @@ class PropertyUpdate(BaseModel):
 class Property(PropertyBase):
     property_id: str
     owner_id: str
+    images: Optional[List[str]] = []
