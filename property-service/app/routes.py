@@ -80,33 +80,61 @@ def delete_property(property_id: str):
     return {"message": "Property deleted"}
 
 @router.post("/{property_id}/images")
-async def upload_property_image(
+async def upload_property_images(
     property_id: str,
-    file: UploadFile = File(...)
+    files: list[UploadFile] = File(...)
 ):
     response = table.get_item(Key={"property_id": property_id})
     if "Item" not in response:
         raise HTTPException(status_code=404, detail="Property not found")
 
-    filename = f"{uuid.uuid4()}-{file.filename}"
-    filepath = UPLOAD_DIR / filename
+    image_urls = []
 
-    with open(filepath, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    for file in files:
+        filename = f"{uuid.uuid4()}-{file.filename}"
+        filepath = UPLOAD_DIR / filename
 
-    image_url = f"/uploads/{filename}"
+        with open(filepath, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+
+        image_url = f"/uploads/{filename}"
+        image_urls.append(image_url)
 
     table.update_item(
         Key={"property_id": property_id},
-        UpdateExpression="SET images = list_append(if_not_exists(images, :empty), :img)",
+        UpdateExpression="SET images = list_append(if_not_exists(images, :empty), :imgs)",
         ExpressionAttributeValues={
-            ":img": [image_url],
+            ":imgs": image_urls,
             ":empty": []
         }
     )
 
     return {
-        "message": "Image uploaded",
+        "message": "Images uploaded",
         "property_id": property_id,
-        "image_url": image_url
+        "images": image_urls
     }
+
+@router.delete("/{property_id}/images")
+def delete_property_image(property_id: str, image_url: str):
+    response = table.get_item(Key={"property_id": property_id})
+    if "Item" not in response:
+        raise HTTPException(status_code=404, detail="Property not found")
+
+    property_item = response["Item"]
+    images = property_item.get("images", [])
+
+    if image_url not in images:
+        raise HTTPException(status_code=404, detail="Image not found")
+
+    updated_images = [img for img in images if img != image_url]
+
+    table.update_item(
+        Key={"property_id": property_id},
+        UpdateExpression="SET images = :imgs",
+        ExpressionAttributeValues={
+            ":imgs": updated_images
+        }
+    )
+
+    return {"message": "Image removed"}
