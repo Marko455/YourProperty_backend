@@ -22,7 +22,7 @@ class PropertyUpdate(BaseModel):
     rooms: Optional[int]
     bathrooms: Optional[int]
     bedrooms: Optional[int]
-    parking_spot: Optional[int]
+    parking_spots: Optional[int]
     price: Optional[Decimal]
     location: Optional[str]
     type: Optional[str]

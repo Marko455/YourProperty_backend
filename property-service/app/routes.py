@@ -57,10 +57,15 @@ def get_property(property_id: str):
 def update_property(property_id: str, update: PropertyUpdate):
     update_expr = []
     expr_values = {}
+    expr_names = {}
 
     for field, value in update.dict(exclude_unset=True).items():
-        update_expr.append(f"{field} = :{field}")
-        expr_values[f":{field}"] = value
+        placeholder_name = f"#{field}"
+        placeholder_value = f":{field}"
+
+        update_expr.append(f"{placeholder_name} = {placeholder_value}")
+        expr_values[placeholder_value] = value
+        expr_names[placeholder_name] = field
 
     if not update_expr:
         raise HTTPException(status_code=400, detail="No fields to update")
@@ -68,7 +73,8 @@ def update_property(property_id: str, update: PropertyUpdate):
     table.update_item(
         Key={"property_id": property_id},
         UpdateExpression="SET " + ", ".join(update_expr),
-        ExpressionAttributeValues=expr_values
+        ExpressionAttributeValues=expr_values,
+        ExpressionAttributeNames=expr_names
     )
 
     return {"message": "Property updated"}
